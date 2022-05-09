@@ -132,10 +132,13 @@ namespace RainbowEggs
             }
         }
 
-        private static void ColorizeEggs(RequestBuilder rb)
+        private void ColorizeEggs(RequestBuilder rb)
         {
-            var rng = new System.Random(rb.gs.Seed);
-            rb.ReplaceItem("Rancid_Egg", n => NRandomEggs(rng, n));
+            if (Settings.ColourizeRancidEggs)
+            {
+                var rng = new System.Random(rb.gs.Seed);
+                rb.ReplaceItem("Rancid_Egg", n => NRandomEggs(rng, n));
+            }
         }
 
         private static void DefineLogicItems(GenerationSettings gs, LogicManagerBuilder lmb)
