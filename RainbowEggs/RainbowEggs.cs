@@ -134,7 +134,7 @@ namespace RainbowEggs
 
         private void ColorizeEggs(RequestBuilder rb)
         {
-            if (Settings.ColourizeRancidEggs)
+            if (Settings.ColorizeRancidEggs)
             {
                 var rng = new System.Random(rb.gs.Seed);
                 rb.ReplaceItem("Rancid_Egg", n => NRandomEggs(rng, n));
