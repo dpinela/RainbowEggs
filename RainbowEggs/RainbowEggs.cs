@@ -10,11 +10,7 @@ using MenuChanger.Extensions;
 using RandomizerMod.Menu;
 using RandomizerMod.Logging;
 using RandomizerMod.RandomizerData;
-using RandomizerMod.Settings;
 using RandomizerMod.RC;
-using RandomizerCore;
-using RandomizerCore.Logic;
-using RandomizerCore.LogicItems;
 using System.Collections.Generic;
 
 namespace RainbowEggs
@@ -126,34 +122,21 @@ namespace RainbowEggs
             }
 
             RequestBuilder.OnUpdate.Subscribe(17f, ColorizeEggs);
-            RCData.RuntimeLogicOverride.Subscribe(50, DefineLogicItems);
             RandomizerMenuAPI.AddMenuPage(BuildMenu, BuildButton);
             SettingsLog.AfterLogSettings += LogRandoSettings;
         }
 
-        private static IEnumerable<string> NRandomEggs(System.Random rng, int n)
-        {
-            for (var i = 0; i < n; i++)
-            {
-                yield return Eggs[rng.Next(Eggs.Count)].InternalName;
-            }
-        }
-
+        // By performing egg replacements this way, the placements and hash are the same regardless
+        // of whether this mod is in use or not.
         private void ColorizeEggs(RequestBuilder rb)
         {
             if (Settings.ColorizeRancidEggs)
             {
                 var rng = new System.Random(rb.gs.Seed);
-                rb.ReplaceItem("Rancid_Egg", n => NRandomEggs(rng, n));
-            }
-        }
-
-        private static void DefineLogicItems(GenerationSettings gs, LogicManagerBuilder lmb)
-        {
-            var value = new TermValue(lmb.GetTerm("RANCIDEGGS"), 1);
-            foreach (var egg in Eggs)
-            {
-                lmb.AddItem(new SingleItem(egg.InternalName, value));
+                rb.EditItemRequest("Rancid_Egg", info =>
+                {
+                    info.realItemCreator = (factory, _) => factory.MakeItem(Eggs[rng.Next(Eggs.Count)].InternalName);
+                });
             }
         }
 
