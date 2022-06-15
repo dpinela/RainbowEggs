@@ -2,6 +2,7 @@ using Modding;
 using ItemChanger;
 using ItemChanger.Items;
 using ItemChanger.UIDefs;
+using ItemChanger.Tags;
 using MenuChanger;
 using MenuChanger.MenuElements;
 using MenuChanger.MenuPanels;
@@ -115,6 +116,12 @@ namespace RainbowEggs
                         sprite = new EmbeddedSprite() { key = egg.Sprite }
                     }
                 };
+                // Tag the item for ConnectionMetadataInjector, so that MapModS and
+                // other mods recognize the items we're adding as eggs.
+                var typeTag = item.AddTag<InteropTag>();
+                typeTag.Message = "RandoSupplementalMetadata";
+                typeTag.Properties["ModSource"] = GetName();
+                typeTag.Properties["PoolGroup"] = "Rancid Eggs";
                 Finder.DefineCustomItem(item);
             }
 
@@ -172,6 +179,6 @@ namespace RainbowEggs
             w.WriteLine(JsonUtil.Serialize(Settings));
         }
 
-        public override string GetVersion() => "1.0";
+        public override string GetVersion() => "1.1";
     }
 }
