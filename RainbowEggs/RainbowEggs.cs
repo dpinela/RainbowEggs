@@ -112,14 +112,15 @@ namespace RainbowEggs
                         sprite = new EmbeddedSprite() { key = egg.Sprite }
                     }
                 };
-                // Tag the item for ConnectionMetadataInjector, so that MapModS and
-                // other mods recognize the items we're adding as eggs.
-                var typeTag = item.AddTag<InteropTag>();
-                typeTag.Message = "RandoSupplementalMetadata";
-                typeTag.Properties["ModSource"] = GetName();
-                typeTag.Properties["PoolGroup"] = "Rancid Eggs";
                 Finder.DefineCustomItem(item);
             }
+            AbstractItem.ModifyItemGlobal += args =>
+            {
+                if (args.Item.GetTag(out EggColorTag eggtag))
+                {
+                    args.Item = Finder.GetItem(eggtag.ReplacementEggName);
+                }
+            };
 
             RequestBuilder.OnUpdate.Subscribe(17f, ColorizeEggs);
             RandomizerMenuAPI.AddMenuPage(BuildMenu, BuildButton);
@@ -135,7 +136,13 @@ namespace RainbowEggs
                 var rng = new System.Random(rb.gs.Seed);
                 rb.EditItemRequest("Rancid_Egg", info =>
                 {
-                    info.realItemCreator = (factory, _) => factory.MakeItem(Eggs[rng.Next(Eggs.Count)].InternalName);
+                    info.realItemCreator = (factory, _) =>
+                    {
+                        var item = factory.MakeItem("Rancid_Egg");
+                        var tag = item.AddTag<EggColorTag>();
+                        tag.ReplacementEggName = Eggs[rng.Next(Eggs.Count)].InternalName;
+                        return item;
+                    };
                 });
             }
         }
