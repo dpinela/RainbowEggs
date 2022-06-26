@@ -128,7 +128,10 @@ namespace RainbowEggs
         }
 
         // By performing egg replacements this way, the placements and hash are the same regardless
-        // of whether this mod is in use or not.
+        // of whether this mod is in use or not. Furthermore, since the tag is only stored locally
+        // and not synced, ItemSync will work even if some but not all the players in a room are using
+        // this mod; eggs will appear with their respective colors for players that have eggs colorized,
+        // and as regular Rancid Eggs for those that do not.
         private void ColorizeEggs(RequestBuilder rb)
         {
             if (Settings.ColorizeRancidEggs)
