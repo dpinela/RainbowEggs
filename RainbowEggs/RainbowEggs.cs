@@ -123,7 +123,7 @@ namespace RainbowEggs
             };
 
             RequestBuilder.OnUpdate.Subscribe(17f, ColorizeEggs);
-            RandomizerMenuAPI.AddMenuPage(BuildMenu, BuildButton);
+            RandomizerMenuAPI.AddMenuPage(_ => {}, BuildButton);
             SettingsLog.AfterLogSettings += LogRandoSettings;
         }
 
@@ -150,19 +150,18 @@ namespace RainbowEggs
             }
         }
 
-        private MenuPage SettingsPage;
-
-        private void BuildMenu(MenuPage landingPage)
-        {
-            SettingsPage = new MenuPage(GetName(), landingPage);
-            var factory = new MenuElementFactory<RandoSettings>(SettingsPage, Settings);
-            new VerticalItemPanel(SettingsPage, new(0, 300), 75f, true, factory.Elements);
-        }
+        private UnityEngine.Color ButtonColor() => Settings.ColorizeRancidEggs ? Colors.TRUE_COLOR : Colors.DEFAULT_COLOR;
 
         private bool BuildButton(MenuPage landingPage, out SmallButton settingsButton)
         {
-            settingsButton = new(landingPage, GetName());
-            settingsButton.AddHideAndShowEvent(landingPage, SettingsPage);
+            var button = new SmallButton(landingPage, GetName());
+            button.Text.color = ButtonColor();
+            button.OnClick += () =>
+            {
+                Settings.ColorizeRancidEggs = !Settings.ColorizeRancidEggs;
+                button.Text.color = ButtonColor();
+            };
+            settingsButton = button;
             return true;
         }
 
@@ -172,6 +171,6 @@ namespace RainbowEggs
             w.WriteLine(JsonUtil.Serialize(Settings));
         }
 
-        public override string GetVersion() => "1.1";
+        public override string GetVersion() => "1.1.1";
     }
 }
