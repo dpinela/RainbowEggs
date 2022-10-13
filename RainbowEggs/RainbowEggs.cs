@@ -150,16 +150,47 @@ namespace RainbowEggs
             }
         }
 
-        private UnityEngine.Color ButtonColor() => Settings.ColorizeRancidEggs ? Colors.TRUE_COLOR : Colors.DEFAULT_COLOR;
+        private const float ConsecutiveClickInterval = .5f;
+        private const int ClicksToToggleSHINY = 7;
 
         private bool BuildButton(MenuPage landingPage, out SmallButton settingsButton)
         {
             var button = new SmallButton(landingPage, GetName());
-            button.Text.color = ButtonColor();
+            var shiny = button.Text.gameObject.AddComponent<SHINY>();
+
+            void UpdateButtonColor()
+            {
+                if (Settings.ColorizeRancidEggs)
+                {
+                    button.Text.color = Colors.TRUE_COLOR;
+                    shiny.enabled = Settings.SHINY;
+                }
+                else         
+                {
+                    shiny.enabled = false;
+                    button.Text.color = Colors.DEFAULT_COLOR;
+                }
+            }
+
+            UpdateButtonColor();
+            var numConsecutiveClicks = 0;
+            var timeOfLastClick = float.NegativeInfinity;
             button.OnClick += () =>
             {
                 Settings.ColorizeRancidEggs = !Settings.ColorizeRancidEggs;
-                button.Text.color = ButtonColor();
+                var now = UnityEngine.Time.time;
+                if (now - timeOfLastClick > ConsecutiveClickInterval)
+                {
+                    numConsecutiveClicks = 0;
+                }
+                timeOfLastClick = now;
+                numConsecutiveClicks++;
+                if (numConsecutiveClicks == ClicksToToggleSHINY)
+                {
+                    Settings.SHINY = !Settings.SHINY;
+                    numConsecutiveClicks = 0;
+                }
+                UpdateButtonColor();
             };
             settingsButton = button;
             return true;
